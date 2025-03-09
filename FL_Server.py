@@ -2,7 +2,7 @@ import torch.nn.functional as F
 import torch 
 
 
-def find_common_intersection(client_paths, client_losses, prev_global_params, num_steps=300, lr=0.001, lambda_reg=1e-3):
+def find_common_intersection(client_paths, client_losses, prev_global_params, num_steps=300, lr=0.001, lambda_reg=1e-2):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
     n_clients = len(client_paths)
@@ -40,7 +40,7 @@ def find_common_intersection(client_paths, client_losses, prev_global_params, nu
         # Backward pass for the primary loss
         
 
-        reg_loss = -sum(F.mse_loss(intersection_point[param_idx], prev_global_params[param_idx]) for param_idx in range(n_params))
+        reg_loss = - sum(F.mse_loss(intersection_point[param_idx], prev_global_params[param_idx]) for param_idx in range(n_params)) # For smoother transitions, we can make regularisation positive. This might help in extreme cases
         total_loss=total_loss+lambda_reg*reg_loss        
         total_loss.backward(retain_graph=True)
 
